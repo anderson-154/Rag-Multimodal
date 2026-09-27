@@ -13,6 +13,7 @@ src/application/prompts/rag_prompt.py
 src/application/services/__init__.py
 src/application/services/rrf.py
 src/application/use_cases/__init__.py
+src/application/use_cases/ingest_document_use_case.py
 src/application/use_cases/query_use_case.py
 src/domain/__init__.py
 src/domain/exceptions.py
@@ -34,12 +35,14 @@ src/domain/ports/reranker_port.py
 src/domain/ports/storage_port.py
 src/domain/ports/vector_store_port.py
 src/domain/services/__init__.py
+src/domain/services/image_linker.py
 src/infrastructure/__init__.py
 src/infrastructure/api/__init__.py
 src/infrastructure/api/logging_config.py
 src/infrastructure/api/middleware.py
 src/infrastructure/api/routers/__init__.py
 src/infrastructure/chunking/__init__.py
+src/infrastructure/chunking/layout_aware_chunker.py
 src/infrastructure/config/__init__.py
 src/infrastructure/config/container.py
 src/infrastructure/config/settings.py
@@ -47,6 +50,9 @@ src/infrastructure/embeddings/__init__.py
 src/infrastructure/embeddings/fake_embedding_adapter.py
 src/infrastructure/embeddings/openai_embedding_adapter.py
 src/infrastructure/jobs/__init__.py
+src/infrastructure/jobs/celery_app.py
+src/infrastructure/jobs/redis_job_repository.py
+src/infrastructure/jobs/tasks.py
 src/infrastructure/llm/__init__.py
 src/infrastructure/llm/ollama_adapter.py
 src/infrastructure/llm/openai_adapter.py

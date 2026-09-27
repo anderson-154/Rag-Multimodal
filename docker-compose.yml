@@ -28,6 +28,23 @@ services:
       - rag_net
     restart: unless-stopped
 
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rag_worker
+    command: celery -A src.infrastructure.jobs.celery_app worker --loglevel=info
+    env_file:
+      - .env
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - redis
+      - qdrant
+    networks:
+      - rag_net
+    restart: unless-stopped
+
   qdrant:
     image: qdrant/qdrant:latest
     container_name: rag_qdrant

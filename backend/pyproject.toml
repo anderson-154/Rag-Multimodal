@@ -18,6 +18,8 @@ dependencies = [
     "tenacity>=8.2",
     "qdrant-client>=1.9",
     "pymupdf>=1.24",
+    "celery>=5.3",
+    "redis>=5.0",
 ]
 
 [project.optional-dependencies]
@@ -58,7 +60,7 @@ no_implicit_optional = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["fitz", "fitz.*"]
+module = ["fitz", "fitz.*", "celery", "celery.*", "redis", "redis.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
