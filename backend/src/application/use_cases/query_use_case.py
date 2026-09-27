@@ -35,7 +35,7 @@ class QueryUseCase:
         self._top_n = top_n
 
     def execute(self, query: Query) -> Answer:
-        query_vector = self._embedder.embed([query.text])[0]
+        query_vector = self._embedder.embed_query(query.text)
 
         semantic = self._vector_store.search_semantic(
             query_vector=query_vector,

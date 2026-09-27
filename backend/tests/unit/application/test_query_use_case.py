@@ -1,7 +1,7 @@
 # backend/tests/unit/application/test_query_use_case.py
 from __future__ import annotations
 
-from src.application.prompts.rag_prompt import NO_INFO_MARKER
+from src.application.prompts.rag_prompt import NO_INFO_MARKER, SYSTEM_PROMPT
 from src.application.services.rrf import reciprocal_rank_fusion
 from src.application.use_cases.query_use_case import QueryUseCase
 from src.domain.entities.answer import Query
@@ -37,12 +37,14 @@ class TestQueryUseCaseEmptyResults:
         assert answer.text == NO_INFO_MARKER
         assert answer.is_grounded is False
         assert answer.citations == []
-        assert llm.message_logs == []
+        assert llm.call_log == []
         assert reranker.calls == []
+        assert len(embedder.called_queries) == 1
+        assert embedder.called_queries[0] == "que pasa?"
 
 
 class TestQueryUseCaseWithChunks:
-    def test_prompt_sent_contains_chunk_contents(self) -> None:
+    def test_prompt_sent_contains_chunk_contents_and_system_prompt(self) -> None:
         bb = BoundingBox(0, 0, 1, 1)
         chunk_a = Chunk(
             id="c1",
@@ -85,10 +87,12 @@ class TestQueryUseCaseWithChunks:
         use_case = QueryUseCase(embedder, vector_store, reranker, llm, top_k=5, top_n=3)
         use_case.execute(Query(text="¿qué dice el chunk A?", top_k=5))
 
-        assert len(llm.message_logs) == 1
-        messages = llm.message_logs[0]
-        assert messages[0].role == "system"
-        user_prompt = messages[1].content
+        assert len(llm.call_log) == 1
+        messages = llm.call_log[0]
+        system_messages = [m for m in messages if m.role == "system"]
+        user_messages = [m for m in messages if m.role == "user"]
+        assert system_messages and system_messages[0].content == SYSTEM_PROMPT
+        user_prompt = user_messages[0].content
         assert "Contenido del chunk A" in user_prompt
         assert "Contenido del chunk B" in user_prompt
         assert "[manual.pdf, p.3]" in user_prompt
@@ -190,10 +194,6 @@ class TestReciprocalRankFusion:
         ]
         fused = reciprocal_rank_fusion([r1, r2], k=60)
         ids = [h.chunk_id for h in fused]
-        # a = 1/61 + 1/62 ~ 0.032524
-        # c = 1/63 + 1/61 ~ 0.032288
-        # b = 1/62 ~ 0.016129
-        # d = 1/63 ~ 0.015873
         assert ids[0] == "a"
         assert ids[1] == "c"
         assert ids[2] == "b"

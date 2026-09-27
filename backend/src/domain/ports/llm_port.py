@@ -2,22 +2,20 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-
-from src.domain.entities.answer import Citation
+from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class LLMMessage:
     role: str
     content: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class LLMResponse:
     text: str
-    grounded: bool = False
-    citations: list[Citation] = field(default_factory=list)
+    input_tokens: int | None = None
+    output_tokens: int | None = None
 
 
 class LLMPort(ABC):

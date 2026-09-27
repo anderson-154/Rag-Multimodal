@@ -10,15 +10,20 @@ from src.domain.ports.vector_store_port import SearchResult, VectorStorePort
 class FakeEmbedder(EmbeddingPort):
     def __init__(self, dimensions: int = 8) -> None:
         self._dimensions = dimensions
-        self.called_texts: list[list[str]] = []
+        self.called_documents: list[list[str]] = []
+        self.called_queries: list[str] = []
 
     @property
     def dimensions(self) -> int:
         return self._dimensions
 
-    def embed(self, texts: list[str]) -> list[list[float]]:
-        self.called_texts.append(list(texts))
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        self.called_documents.append(list(texts))
         return [[float(i + 1)] * self._dimensions for i in range(len(texts))]
+
+    def embed_query(self, text: str) -> list[float]:
+        self.called_queries.append(text)
+        return [1.0] * self._dimensions
 
 
 class FakeVectorStore(VectorStorePort):
@@ -94,8 +99,8 @@ class FakeReranker(RerankerPort):
 class FakeLLM(LLMPort):
     def __init__(self, response_text: str = "Respuesta de prueba.") -> None:
         self.response_text = response_text
-        self.message_logs: list[list[LLMMessage]] = []
+        self.call_log: list[list[LLMMessage]] = []
 
     def chat(self, messages: list[LLMMessage]) -> LLMResponse:
-        self.message_logs.append([LLMMessage(m.role, m.content) for m in messages])
+        self.call_log.append(list(messages))
         return LLMResponse(text=self.response_text)
