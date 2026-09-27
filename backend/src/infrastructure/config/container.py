@@ -24,7 +24,9 @@ def get_llm() -> LLMPort:
 
         api_key = settings.openai_api_key
         if not api_key:
-            raise LLMUnavailableError("LLM_PROVIDER=openai requires OPENAI_API_KEY to be set")
+            raise LLMUnavailableError(
+                "LLM_PROVIDER=openai requires OPENAI_API_KEY to be set"
+            )
         return OpenAILLMAdapter(api_key=api_key, model=settings.llm_model)
 
     if provider == "ollama":
@@ -55,7 +57,9 @@ def get_embedder() -> EmbeddingPort:
 
         api_key = settings.openai_api_key
         if not api_key:
-            raise LLMUnavailableError("EMBEDDING_PROVIDER=openai requires OPENAI_API_KEY to be set")
+            raise LLMUnavailableError(
+                "EMBEDDING_PROVIDER=openai requires OPENAI_API_KEY to be set"
+            )
         return OpenAIEmbeddingAdapter(
             api_key=api_key,
             model=settings.embedding_model,
@@ -63,7 +67,8 @@ def get_embedder() -> EmbeddingPort:
         )
 
     raise LLMUnavailableError(
-        f"Unsupported EMBEDDING_PROVIDER={settings.embedding_provider!r}. Use 'fake' or 'openai'."
+        f"Unsupported EMBEDDING_PROVIDER={settings.embedding_provider!r}. "
+        "Use 'fake' or 'openai'."
     )
 
 
@@ -80,9 +85,7 @@ def get_vector_store() -> VectorStorePort:
     try:
         adapter.ensure_collection()
     except VectorStoreError as exc:
-        logger.warning(
-            "vector_store_ensure_collection_warning", extra={"extra_data": {"error": str(exc)}}
-        )
+        logger.warning("vector_store_ensure_collection_warning", extra={"extra_data": {"error": str(exc)}})
     return adapter
 
 
