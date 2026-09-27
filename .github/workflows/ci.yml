@@ -1,0 +1,59 @@
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  quality:
+    name: Quality checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: ruff check src tests
+
+      - name: Ruff format check
+        run: ruff format --check src tests
+
+      - name: Mypy type check
+        run: mypy src/domain src/application
+
+      - name: Unit tests
+        run: pytest tests/unit
+
+      - name: Architecture rules
+        run: |
+          FORBIDDEN="openai|qdrant_client|fitz|celery|fastapi|redis|httpx"
+          echo "Checking src/domain for forbidden imports: $FORBIDDEN"
+          if grep -rE "^\s*(import|from)\s+($FORBIDDEN)\b" src/domain; then
+            echo "ERROR: Forbidden imports found in src/domain"
+            exit 1
+          fi
+          echo "Checking src/application for forbidden imports: $FORBIDDEN"
+          if grep -rE "^\s*(import|from)\s+($FORBIDDEN)\b" src/application; then
+            echo "ERROR: Forbidden imports found in src/application"
+            exit 1
+          fi
+          echo "Architecture rules OK"
