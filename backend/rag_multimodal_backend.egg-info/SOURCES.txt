@@ -41,6 +41,7 @@ src/infrastructure/api/middleware.py
 src/infrastructure/api/routers/__init__.py
 src/infrastructure/chunking/__init__.py
 src/infrastructure/config/__init__.py
+src/infrastructure/config/container.py
 src/infrastructure/config/settings.py
 src/infrastructure/embeddings/__init__.py
 src/infrastructure/embeddings/fake_embedding_adapter.py
@@ -50,5 +51,8 @@ src/infrastructure/llm/__init__.py
 src/infrastructure/llm/ollama_adapter.py
 src/infrastructure/llm/openai_adapter.py
 src/infrastructure/parsers/__init__.py
+src/infrastructure/reranker/noop_reranker.py
 src/infrastructure/resilience/__init__.py
 src/infrastructure/vector_store/__init__.py
+src/infrastructure/vector_store/in_memory_adapter.py
+src/infrastructure/vector_store/qdrant_adapter.py
