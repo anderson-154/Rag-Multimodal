@@ -1,0 +1,11 @@
+# docker-compose.staging.yml
+version: "3.9"
+
+services:
+  api:
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --workers 4
+    environment:
+      APP_ENV: staging
+      LOG_LEVEL: INFO
+      LLM_PROVIDER: openai
+    restart: unless-stopped

@@ -1,0 +1,49 @@
+# docker-compose.yml
+version: "3.9"
+
+networks:
+  rag_net:
+    driver: bridge
+
+volumes:
+  qdrant_data:
+  redis_data:
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rag_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./storage:/app/storage
+    depends_on:
+      - qdrant
+      - redis
+    networks:
+      - rag_net
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: rag_qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - rag_net
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: rag_redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - rag_net
+    restart: unless-stopped

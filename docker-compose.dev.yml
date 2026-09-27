@@ -1,0 +1,29 @@
+# docker-compose.dev.yml
+version: "3.9"
+
+services:
+  api:
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: DEBUG
+      LLM_PROVIDER: ollama
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - ./backend/src:/app/src:ro
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - rag_net
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
