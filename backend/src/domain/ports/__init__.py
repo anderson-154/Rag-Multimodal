@@ -13,7 +13,7 @@ from src.domain.ports.job_repository_port import JobRepositoryPort
 from src.domain.ports.llm_port import LLMMessage, LLMPort, LLMResponse
 from src.domain.ports.reranker_port import RerankerPort, RerankHit
 from src.domain.ports.storage_port import StoragePort
-from src.domain.ports.vector_store_port import VectorSearchHit, VectorStorePort
+from src.domain.ports.vector_store_port import SearchResult, VectorStorePort
 
 __all__ = [
     "ChunkerPort",
@@ -30,7 +30,7 @@ __all__ = [
     "ParsedImage",
     "RerankHit",
     "RerankerPort",
+    "SearchResult",
     "StoragePort",
-    "VectorSearchHit",
     "VectorStorePort",
 ]
