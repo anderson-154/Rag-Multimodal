@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Entornos
+.env
+.env.development
+.env.staging
+.env.production
+*.local
+
+# Node
+node_modules/
+.next/
+out/
+
+# Datos y artefactos
+storage/
+data/
+*.pdf
+!docs/samples/*.pdf
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
