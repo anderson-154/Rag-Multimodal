@@ -51,6 +51,7 @@ src/infrastructure/llm/__init__.py
 src/infrastructure/llm/ollama_adapter.py
 src/infrastructure/llm/openai_adapter.py
 src/infrastructure/parsers/__init__.py
+src/infrastructure/parsers/pymupdf_adapter.py
 src/infrastructure/reranker/noop_reranker.py
 src/infrastructure/resilience/__init__.py
 src/infrastructure/vector_store/__init__.py
