@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 from math import ceil
 from typing import TYPE_CHECKING, Any
 
@@ -258,7 +259,8 @@ class QdrantVectorStoreAdapter(VectorStorePort):
                 "y1": chunk.bbox.y1,
             },
         }
-        point: PointStruct = models.PointStruct(id=chunk.id, vector=vector, payload=payload)
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, chunk.id))
+        point: PointStruct = models.PointStruct(id=point_id, vector=vector, payload=payload)
         return point
 
     def _to_chunk(self, payload: dict[str, object]) -> Chunk | None:
