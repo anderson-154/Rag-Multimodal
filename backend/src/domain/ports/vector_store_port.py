@@ -4,22 +4,22 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from src.domain.entities.chunk import Chunk
+
 
 @dataclass
 class SearchResult:
-    chunk_id: str
+    chunk: Chunk
     score: float
     source: str = "semantic"
 
 
 class VectorStorePort(ABC):
     @abstractmethod
-    def upsert(
-        self,
-        ids: list[str],
-        vectors: list[list[float]],
-        payloads: list[dict[str, object]] | None = None,
-    ) -> None: ...
+    def ensure_collection(self) -> None: ...
+
+    @abstractmethod
+    def upsert(self, chunks: list[Chunk], vectors: list[list[float]]) -> None: ...
 
     @abstractmethod
     def search_semantic(
@@ -32,13 +32,13 @@ class VectorStorePort(ABC):
     @abstractmethod
     def search_keyword(
         self,
-        query_text: str,
+        query: str,
         top_k: int,
         document_ids: list[str] | None = None,
     ) -> list[SearchResult]: ...
 
     @abstractmethod
-    def get_chunks(self, chunk_ids: list[str]) -> dict[str, dict[str, object]]: ...
+    def delete_by_document(self, document_id: str) -> int: ...
 
     @abstractmethod
-    def delete_by_document(self, document_id: str) -> int: ...
+    def list_documents(self) -> list[str]: ...

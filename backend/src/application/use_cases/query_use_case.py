@@ -7,8 +7,7 @@ from src.application.prompts.rag_prompt import (
 )
 from src.application.services.rrf import reciprocal_rank_fusion
 from src.domain.entities.answer import Answer, Citation, Query
-from src.domain.entities.bounding_box import BoundingBox
-from src.domain.entities.chunk import Chunk, ChunkType
+from src.domain.entities.chunk import Chunk
 from src.domain.ports.embedding_port import EmbeddingPort
 from src.domain.ports.llm_port import LLMMessage, LLMPort
 from src.domain.ports.reranker_port import RerankerPort, RerankHit
@@ -35,7 +34,7 @@ class QueryUseCase:
         self._top_n = top_n
 
     def execute(self, query: Query) -> Answer:
-        query_vector = self._embedder.embed([query.text])[0]
+        query_vector = self._embedder.embed_query(query.text)
 
         semantic = self._vector_store.search_semantic(
             query_vector=query_vector,
@@ -43,7 +42,7 @@ class QueryUseCase:
             document_ids=query.document_ids,
         )
         keyword = self._vector_store.search_keyword(
-            query_text=query.text,
+            query=query.text,
             top_k=self._top_k,
             document_ids=query.document_ids,
         )
@@ -52,16 +51,12 @@ class QueryUseCase:
         if not fused:
             return self._no_info_answer()
 
-        fused_ids = [hit.chunk_id for hit in fused]
-        id_to_chunk = self._materialize_chunks(self._vector_store.get_chunks(fused_ids))
-        chunks_in_order = [id_to_chunk[cid] for cid in fused_ids if cid in id_to_chunk]
+        ordered_chunks = [result.chunk for result in fused]
+        chunks_by_id = {chunk.id: chunk for chunk in ordered_chunks}
 
-        if not chunks_in_order:
-            return self._no_info_answer()
-
-        rerank_hits = self._rerank(query.text, chunks_in_order)
+        rerank_hits = self._rerank(query.text, ordered_chunks)
         top_chunks = [
-            id_to_chunk[hit.chunk_id] for hit in rerank_hits if hit.chunk_id in id_to_chunk
+            chunks_by_id[hit.chunk_id] for hit in rerank_hits if hit.chunk_id in chunks_by_id
         ]
 
         if not top_chunks:
@@ -82,37 +77,6 @@ class QueryUseCase:
 
     def _no_info_answer(self) -> Answer:
         return Answer(text=NO_INFO_MARKER, citations=[], is_grounded=False)
-
-    def _materialize_chunks(self, payloads: dict[str, dict[str, object]]) -> dict[str, Chunk]:
-        """Rebuilds domain Chunks from vector store payloads, skipping malformed ones."""
-        materialized: dict[str, Chunk] = {}
-
-        for chunk_id, payload in payloads.items():
-            bbox = payload.get("bbox")
-            chunk_type = payload.get("chunk_type")
-
-            if not isinstance(bbox, BoundingBox) or not isinstance(chunk_type, str):
-                continue
-
-            parent_id = payload.get("parent_id")
-            raw_image_ids = payload.get("image_ids") or []
-            if not isinstance(raw_image_ids, list):
-                raw_image_ids = []
-            image_ids = [str(image_id) for image_id in raw_image_ids]
-
-            materialized[chunk_id] = Chunk(
-                id=chunk_id,
-                content=str(payload.get("content", "")),
-                hierarchy_path=str(payload.get("hierarchy_path", "")),
-                document_id=str(payload.get("document_id", "")),
-                page=int(str(payload.get("page", 0))),
-                bbox=bbox,
-                chunk_type=ChunkType(chunk_type),
-                parent_id=str(parent_id) if parent_id is not None else None,
-                image_ids=image_ids,
-            )
-
-        return materialized
 
     def _rerank(self, query_text: str, chunks: list[Chunk]) -> list[RerankHit]:
         return self._reranker.rerank(

@@ -1,33 +1,59 @@
-# backend/src/domain/ports/__init__.py
-from src.domain.ports.chunk_repository_port import ChunkRepositoryPort
-from src.domain.ports.chunker_port import ChunkerPort
-from src.domain.ports.document_parser_port import (
+# backend/src/domain/__init__.py
+from src.domain.entities import (
+    Answer,
+    BoundingBox,
+    Chunk,
+    ChunkType,
+    Citation,
+    Document,
+    ExtractedImage,
+    Job,
+    JobStatus,
+    Query,
+)
+from src.domain.ports import (
+    ChunkerPort,
+    ChunkRepositoryPort,
     DocumentParserPort,
+    DocumentRepositoryPort,
+    EmbeddingPort,
+    JobRepositoryPort,
+    LLMMessage,
+    LLMPort,
+    LLMResponse,
     ParsedBlock,
     ParsedDocument,
     ParsedImage,
+    RerankerPort,
+    RerankHit,
+    SearchResult,
+    StoragePort,
+    VectorStorePort,
 )
-from src.domain.ports.document_repository_port import DocumentRepositoryPort
-from src.domain.ports.embedding_port import EmbeddingPort
-from src.domain.ports.job_repository_port import JobRepositoryPort
-from src.domain.ports.llm_port import LLMMessage, LLMPort, LLMResponse
-from src.domain.ports.reranker_port import RerankerPort, RerankHit
-from src.domain.ports.storage_port import StoragePort
-from src.domain.ports.vector_store_port import SearchResult, VectorStorePort
 
 __all__ = [
+    "Answer",
+    "BoundingBox",
+    "Chunk",
+    "ChunkType",
     "ChunkRepositoryPort",
     "ChunkerPort",
+    "Citation",
+    "Document",
     "DocumentParserPort",
     "DocumentRepositoryPort",
     "EmbeddingPort",
+    "ExtractedImage",
+    "Job",
     "JobRepositoryPort",
+    "JobStatus",
     "LLMMessage",
     "LLMPort",
     "LLMResponse",
     "ParsedBlock",
     "ParsedDocument",
     "ParsedImage",
+    "Query",
     "RerankHit",
     "RerankerPort",
     "SearchResult",
